@@ -329,8 +329,6 @@ class LLMNeedleHaystackTester:
             # q_outputs = self.model_to_test(input_ids=input_ids[:,:-1].to("cuda"), use_cache=True, return_dict=True)
             q_outputs = self.model_to_test(
                 input_ids=input_ids[:, :-1].to("cuda"),
-                attention_mask=attention_mask.to("cuda") if attention_mask is not None else None,
-                position_ids=position_ids.to("cuda") if position_ids is not None else None,
                 use_cache=True,
                 return_dict=True
             )
