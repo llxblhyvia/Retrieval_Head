@@ -178,18 +178,17 @@ class LLMNeedleHaystackTester:
                 )
                 self.model_to_test = Qwen2ForCausalLM.from_pretrained(
                     model_name,
-                    device_map="auto",
+                    device_map=None,
                     trust_remote_code=True,
                     quantization_config=self.bnb_config  # 4-bit quant
-                ).eval()
+                ).to("cuda").eval()
             else:
                 self.model_to_test = Qwen2ForCausalLM.from_pretrained(
                     model_name,
                     torch_dtype=torch.float16,
-                    device_map="auto",
+                    device_map=None,
                     trust_remote_code=True
-                ).eval()
-            self.model_to_test.to("cuda")
+                ).to("cuda").eval()
 
 
         elif "Mixtral" in self.model_version:
@@ -314,10 +313,10 @@ class LLMNeedleHaystackTester:
             prompt = [
             {"role": "user", "content": f"<book>{context}</book>\nBased on the content of the book, Question: {self.retrieval_question}\nAnswer:"},
             ]
-            input_ids = self.enc.apply_chat_template(conversation=prompt, tokenize=True,  add_generation_prompt=True, return_tensors='pt')
+            input_ids = self.enc.apply_chat_template(conversation=prompt, tokenize=True,  add_generation_prompt=True, return_tensors='pt').to("cuda")
         else:
             input_context = context + question
-            input_ids = self.enc(input_context , return_tensors="pt")['input_ids']
+            input_ids = self.enc(input_context , return_tensors="pt")['input_ids'].to("cuda")
         
         # Prepare your message to send to the model you're going to evaluate
         test_start_time = time.time()
