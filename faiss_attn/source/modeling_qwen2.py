@@ -849,6 +849,9 @@ class Qwen2SdpaAttention(Qwen2Attention):
         attn_output = self.o_proj(attn_output)
 
         return attn_output, None, past_key_value
+    
+    def forward_torch(self, *args, **kwargs):
+        return self.forward(*args, **kwargs)
 
 
 QWEN2_ATTENTION_CLASSES = {
