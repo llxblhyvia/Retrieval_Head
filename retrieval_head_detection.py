@@ -275,7 +275,7 @@ class LLMNeedleHaystackTester:
         past_kv = q_outputs.past_key_values
         for step_i in range(decode_len):
             inp = inp.view(1, 1)
-            outputs = self.model_to_test(input_ids=inp, past_key_values=past_kv, use_cache=True, output_attentions=True, attn_mode="torch" )
+            outputs = self.model_to_test(input_ids=inp, past_key_values=past_kv, use_cache=True, output_attentions=True, attn_mode="flash" )
             past_kv = outputs.past_key_values
             inp = outputs.logits[0, -1].argmax()
             step_token = self.enc.convert_ids_to_tokens(inp.item())
