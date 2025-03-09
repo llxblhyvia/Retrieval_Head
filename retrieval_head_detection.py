@@ -185,10 +185,12 @@ class LLMNeedleHaystackTester:
             else:
                 self.model_to_test = Qwen2ForCausalLM.from_pretrained(
                     model_name,
-                    torch_dtype="auto",
+                    torch_dtype=torch.float16,
                     device_map="auto",
                     trust_remote_code=True
                 ).eval()
+            self.model_to_test.to("cuda")
+
 
         elif "Mixtral" in self.model_version:
             self.model_to_test = MixtralForCausalLM.from_pretrained(
@@ -324,7 +326,14 @@ class LLMNeedleHaystackTester:
             input_ids = input_ids.to(self.model_to_test.device)
         self.needle_start, self.needle_end = self.find_needle_idx(self.real_needle)
         with torch.no_grad():
-            q_outputs = self.model_to_test(input_ids=input_ids[:,:-1], use_cache=True, return_dict=True)
+            # q_outputs = self.model_to_test(input_ids=input_ids[:,:-1].to("cuda"), use_cache=True, return_dict=True)
+            q_outputs = self.model_to_test(
+                input_ids=input_ids[:, :-1].to("cuda"),
+                attention_mask=attention_mask.to("cuda") if attention_mask is not None else None,
+                position_ids=position_ids.to("cuda") if position_ids is not None else None,
+                use_cache=True,
+                return_dict=True
+            )
             output, retrieval_score  = self.decode(q_outputs, input_ids[:,-1], 50)
             response = self.enc.decode(output,skip_special_tokens=True).strip()
 
